@@ -129,6 +129,7 @@ public class Session implements Comparable<Session>
             logout_time = DateConverter(this.getLogoutTime());
             duration_in_format = DurationConverter(this.getDuration()); 
         }
+        
         return String.format("\n %s, terminal %d, duration %s \n logged in: %s \n logged out: %s \n", this.getUsername(), this.getTerminal(), duration_in_format, login_time, logout_time);  
     }
 
@@ -199,8 +200,27 @@ public class Session implements Comparable<Session>
         return String.format("%d days %d hours %d minutes %d seconds", days, hours, minutes, seconds); 
     }
 
+    @Override
     public int compareTo(Session other) throws NullPointerException, ClassCastException
     {
+        // if (obj == null)
+        //     throw new NullPointerException("Cannot compare to null object.");
+        
+        // if (this == obj)
+        //     return 0;
+        
+        // if (this.getClass() != obj.getClass())
+        //     throw new ClassCastException("Cannot compare two objects of different classes.");
+        
+        // Session other = (Session) obj;
+
+        // if (this.getLoginTime().getTime() < other.getLoginTime().getTime())
+        //     return -1; 
+        // else if (this.getLoginTime().getTime() > other.getLoginTime().getTime())
+        //     return 1; 
+        // else 
+        //     return 0;
+
         if (other == null)
             throw new NullPointerException("Cannot compare to null object.");
         

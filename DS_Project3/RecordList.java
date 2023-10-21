@@ -192,7 +192,8 @@ public class RecordList extends DLL<Record>
             Session current_session = itr.next();
             if(current_session.getLogoutTime() != null){
                 long session_time = current_session.getDuration();
-                total_time += session_time;
+                if(session_time > 0)
+                    total_time += session_time;
             }
         }
 

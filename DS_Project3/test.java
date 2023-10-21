@@ -13,6 +13,11 @@ public class test
         }
 
         iList1.add(2);
+        iList1.add(3);
+        iList1.add(4);
+        iList1.add(-1);
+        iList1.add(0);
+        iList1.add(1);
 
         System.out.println(iList1);
 

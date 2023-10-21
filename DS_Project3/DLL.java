@@ -68,7 +68,7 @@ public class DLL<E extends Comparable<E>> implements Iterable<E>
         
         Node current = head;
 
-        while(current.next != null){
+        while(current != null){
             if(current.data.compareTo(newNode.data) > 0){
                 if(current == head){
                     newNode.next = head;

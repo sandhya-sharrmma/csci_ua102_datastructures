@@ -152,9 +152,7 @@ public class LoginStats
                 }
             else
                 user = parse_input.next();
-            
-            
-
+        
             //check if the username contains valid characters (alphanumeric and underscore acceptable)
             if(!user.matches("^[a-zA-Z0-9_]+$")){
                 System.out.println("Please enter a valid user name containing alphanumeric characters (underscores accepted).");
