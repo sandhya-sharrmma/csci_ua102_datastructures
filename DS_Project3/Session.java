@@ -1,4 +1,5 @@
-// package project3; 
+package project3;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -10,6 +11,10 @@ import java.util.NoSuchElementException;
 /* *
 *
 * This class represents a single session in the terminal in the multi-user system.
+* It is made of a login and logout record of the same user in the same terminal. 
+* The login and logout records are represented by Record objects.
+* If the user has not logged out yet, the logout record is null.
+* This class implements Comparable interface to compare two Session objects.
 * 
 * @author Sandhya Sharma
 *
@@ -52,13 +57,9 @@ public class Session implements Comparable<Session>
         if (logout != null && login.getUsername() != logout.getUsername())
             throw new IllegalArgumentException("The username of the user for a single session must match.");
 
-        if (logout != null && logout.getTime().compareTo(login.getTime()) < 0) {
-            System.out.println(logout.getTime());
-            System.out.println(login.getTime());
+        if (logout != null && logout.getTime().compareTo(login.getTime()) < 0)
             throw new IllegalArgumentException("Time mismatch.");
-        }
 
-        //SUS
         if((login.isLogin() == false))
             throw new IllegalArgumentException("Login mismatch.");
         
@@ -100,6 +101,7 @@ public class Session implements Comparable<Session>
 
     /**
      * Returns the duration of this Session object.
+     * If the session is still active, the duration is -1.
      * @return the duration of this Session object in milliseconds if the session is inactive
      */
     public long getDuration()
@@ -176,7 +178,7 @@ public class Session implements Comparable<Session>
      * @return the string containing the duration of this Session object
      * @throws IllegalArgumentException if the given duration is invalid
      */
-    public String DurationConverter(long duration)
+    public String DurationConverter(long duration) throws IllegalArgumentException
     {
         if (duration < 0)
             throw new IllegalArgumentException("Duration cannot be negative.");
@@ -197,38 +199,25 @@ public class Session implements Comparable<Session>
             throw new IllegalArgumentException("Incorrect value for time.");
         }
 
-        return String.format("%d days %d hours %d minutes %d seconds", days, hours, minutes, seconds); 
+        return String.format("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, seconds); 
     }
 
+    /**
+     * Compares this Session object with the specified Session object. 
+     * @return 1 if this Session object is greater than the specified Session object,
+     * -1 if this Session object is less than the specified Session object,
+     * or 0 if both Session objects are equal. Here, the parameter being measured is the login time.
+     * An earlier login time is considered smaller.
+     * @throws NullPointerException if other Session object is null
+     */
     @Override
-    public int compareTo(Session other) throws NullPointerException, ClassCastException
+    public int compareTo(Session other) throws NullPointerException
     {
-        // if (obj == null)
-        //     throw new NullPointerException("Cannot compare to null object.");
-        
-        // if (this == obj)
-        //     return 0;
-        
-        // if (this.getClass() != obj.getClass())
-        //     throw new ClassCastException("Cannot compare two objects of different classes.");
-        
-        // Session other = (Session) obj;
-
-        // if (this.getLoginTime().getTime() < other.getLoginTime().getTime())
-        //     return -1; 
-        // else if (this.getLoginTime().getTime() > other.getLoginTime().getTime())
-        //     return 1; 
-        // else 
-        //     return 0;
-
         if (other == null)
             throw new NullPointerException("Cannot compare to null object.");
         
         if (this == other)
             return 0;
-        
-        if (this.getClass() != other.getClass())
-            throw new ClassCastException("Cannot compare two objects of different classes.");
 
         if (this.getLoginTime().getTime() < other.getLoginTime().getTime())
             return -1; 
@@ -238,8 +227,14 @@ public class Session implements Comparable<Session>
             return 0; 
     }
 
+    /**
+     * Compares this Session object with the specified object for equality.  
+     * A matched session is such with matching login and logout records. 
+     * @return true if this Session object is equal to the specified Session object, false otherwise
+     * @throws NullPointerException if other Session object is null
+     */
     @Override
-    public boolean equals(Object obj) throws ClassCastException, NullPointerException
+    public boolean equals(Object obj) throws NullPointerException
     {
         if (obj == null)
             throw new NullPointerException("Cannot compare to null object.");
@@ -247,18 +242,24 @@ public class Session implements Comparable<Session>
         if (this == obj)
             return true;
         
-        if (this.getClass() != obj.getClass())
-            throw new ClassCastException("Cannot compare two objects of different classes.");
+        if (!this.getClass().equals(obj.getClass()))
+            return false;
 
         Session other = (Session) obj;
 
         boolean login_match = false, logout_match = false; 
 
-        if(this.getLoginTime().getTime() == other.getLoginTime().getTime() && this.getTerminal() == other.getTerminal() && this.getUsername().equals(other.getUsername()))
+        if(this.getLoginTime().getTime() == other.getLoginTime().getTime() && this.getTerminal() == other.getTerminal() && this.getUsername().equalsIgnoreCase(other.getUsername()))
             login_match = true;
         
-        if(this.getLogoutTime().getTime() == other.getLogoutTime().getTime() && this.getTerminal() == other.getTerminal() && this.getUsername().equals(other.getUsername()))
+        if(this.logout == null){
+            if(other.logout == null)
+                logout_match = true;
+            return login_match && logout_match;
+        } 
+        else if(this.getLogoutTime().equals(other.getLogoutTime()) && this.getTerminal() == other.getTerminal() && this.getUsername().equalsIgnoreCase(other.getUsername()))
             logout_match = true;
+        
 
         return login_match && logout_match; 
     }

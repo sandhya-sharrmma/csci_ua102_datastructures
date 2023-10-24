@@ -1,11 +1,13 @@
-// package project3; 
+package project3;
+
 import java.util.Date;
 import java.util.NoSuchElementException;
 
 /* *
 *
 * This class represents a single login or logout record into the terminal in the multi-user system.
-*
+* It contains the terminal value, login status, username and time of login or logout.
+* It implements the Comparable interface to compare two Record objects.
 * @author Sandhya Sharma
 *
 */
@@ -83,7 +85,6 @@ public class Record implements Comparable<Record>
         return terminal; 
     }
 
-    //can i compare with an obj instead of a record?
     @Override 
     public int compareTo(Record other) throws NullPointerException, ClassCastException
     {
@@ -105,16 +106,16 @@ public class Record implements Comparable<Record>
     }
 
     @Override
-    public boolean equals(Object obj) throws ClassCastException
+    public boolean equals(Object obj)
     {
         if (obj == null)
             return false; 
 
-        if (this == obj)
+        if (obj == this)
             return true; 
 
-        if (this.getClass() != obj.getClass())
-            throw new ClassCastException("Cannot compare two objects of two different classes."); 
+        if (!this.getClass().equals(obj.getClass()))
+            return false;
 
         Record other = (Record) obj; 
 
@@ -124,12 +125,17 @@ public class Record implements Comparable<Record>
         if (this.isLogin() != other.isLogin())
             return false; 
 
-        if (this.getUsername().equalsIgnoreCase(other.getUsername())) 
+        if (!this.getUsername().equalsIgnoreCase(other.getUsername())) 
             return false; 
 
-        if (this.getTime() != other.getTime())
+        if (!this.getTime().equals(other.getTime()))
             return false; 
 
         return true; 
+    }
+
+    public void toString(Record record)
+    {
+        System.out.println(record.getTerminal() + " " + record.isLogin() + " " + record.getUsername() + " " + record.getTime());
     }
 }

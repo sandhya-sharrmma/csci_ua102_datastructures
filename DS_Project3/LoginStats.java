@@ -1,9 +1,11 @@
-// package project3; 
+package project3;
+
 import java.io.File;
 import java.io.FileNotFoundException; 
 import java.util.Scanner;
 import java.util.Date;
 import java.util.NoSuchElementException;
+import java.util.Iterator;
 
 /* *
 *
@@ -19,7 +21,7 @@ import java.util.NoSuchElementException;
 *
 */
 
-public class LoginStats
+public class LoginStats 
 {
     /**
      * The main() method of this program. 
@@ -77,33 +79,36 @@ public class LoginStats
             try {
                 line = read_file.nextLine(); 
                 parse_line = new Scanner(line); 
-                parse_line.useDelimiter(" "); 
+                parse_line.useDelimiter("\\s+"); 
                 given_terminal = Integer.parseInt(parse_line.next()); 
                 
                 login = given_terminal > 0;
 
-                terminal = Math.abs(given_terminal); 
+                terminal = Math.abs(given_terminal);
+                
+                String input_time = parse_line.next();
+                if (!input_time.isEmpty())
+                    time = new Date(Long.parseLong(input_time));
+                else
+                    throw new NoSuchElementException("No time found.");
 
-                time = new Date(Long.parseLong(parse_line.next())); 
                 username = parse_line.next();
 
             } catch (NoSuchElementException e) {
                 System.err.println("Error caused by the following line in input file: \n" + line);
                 continue; 
-            }
+            } 
 
             try {
                 Record new_record = new Record(terminal, login, username, time);
                 inventory.add(new_record);  
             } catch (IllegalArgumentException e) {
-                // TODO: handle exception
+               //no particular action needed
             }
         }
 
-        parse_line.close(); 
-        
-        Record rec1 = new Record(1, true, "user1", new Date(1000));
-        Record rec2 = new Record(2, true, "user2", new Date(2000));
+        if(parse_line != null)
+            parse_line.close();
 
         //USER INTERFACE 
         Scanner user_input = new Scanner(System.in); 
@@ -141,7 +146,7 @@ public class LoginStats
 
             //scanning and parsing the input to command and user name
             Scanner parse_input = new Scanner(input);
-            parse_input.useDelimiter(" "); 
+            parse_input.useDelimiter("\\s+"); 
             String command = parse_input.next(); 
             String user = " ";
 
@@ -165,7 +170,7 @@ public class LoginStats
                     Session output = inventory.getFirstSession(user); 
                     System.out.println(output); 
                 } catch (NoSuchElementException e) {
-                    System.err.println("No such user found."); 
+                    System.err.println("No such user found to return the first session."); 
                     continue;  
                 }
             }
@@ -175,17 +180,20 @@ public class LoginStats
                     Session output = inventory.getLastSession(user);
                     System.out.println(output);  
                 } catch (NoSuchElementException e) {
-                    System.err.println("No such user found."); 
+                    System.err.println("No such user found to return the last session."); 
                     continue;   
                 }
             }
             //if the command is 'all'
             else if(command.equalsIgnoreCase("all")) {
                 try {
-                    DLL output = inventory.getAllSessions(user); 
-                    System.out.println(output); 
+                    SortedLinkedList<Session> output = inventory.getAllSessions(user);    
+                    Iterator<Session> iter = output.iterator();
+                    while(iter.hasNext()){
+                        System.out.println(iter.next());
+                    }
                 } catch (NoSuchElementException e) {
-                    System.err.println("No such user found."); 
+                    System.err.println("No such user found to return any session."); 
                     continue;  
                 }
             }
@@ -217,16 +225,16 @@ public class LoginStats
                     } catch (IllegalArgumentException e) {
                         throw new IllegalArgumentException("Incorrect value for time.");
                     }
-                    String formatted_time = String.format("%d days %d hours %d minutes %d seconds", days, hours, minutes, seconds);
+                    String formatted_time = String.format("%d days, %d hours, %d minutes, %d seconds", days, hours, minutes, seconds);
                     System.out.println(user + ", total duration " + formatted_time);
 
                 } catch (Exception e) {
-                    System.err.println("No such user found."); 
+                    System.err.println("No such user found to return total time."); 
                     continue; 
                 }
             }
             // anything else is an invalid command, if there is a third word (eg: last name) after the user name, 
-            // it will be ignored and only the entry after 'first' or 'last' will be taken into consideration
+            // it will be ignored and only the entry after 'first','last', 'total', 'all' will be taken into consideration
             else {
                 System.err.println("Please enter a valid command.");
                 continue; 
