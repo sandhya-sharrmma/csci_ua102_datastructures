@@ -1,33 +1,31 @@
+package project4;
+
 import java.util.Comparator;
 
 public class FileOnDiskComparatorBySize implements Comparator<FileOnDisk>
 {
     public int compare(FileOnDisk o1, FileOnDisk o2)
     {
-        if(o1 == null || o2 == null)
-            throw new NullPointerException("ERROR: One or both of the files are null."); 
-
-        if(o1.exists() == false || o2.exists() == false)
-            throw new IllegalStateException("ERROR: One or both of the files do not exist.");
-
-        if(o1 == o2)
-            return 0;
-        
-        if(o1.getTotalSize() > o2.getTotalSize())
-            return 1;
-        else if(o1.getTotalSize() < o2.getTotalSize())
-            return -1;
-        else{
-            int temp = -5; 
-            try{
-                temp = o1.getCanonicalFile().compareTo(o2.getAbsoluteFile());
-            }
-            catch(Exception e){
-                System.out.println("ERROR: " + e.getMessage());
-            }
-
-            return temp; 
+        if (o1 == null || o2 == null) {
+            throw new NullPointerException("ERROR: One or both of the files are null.");
         }
-            
+
+        // Compare by size
+        long sizeDiff = o1.getTotalSize() - o2.getTotalSize();
+        if (sizeDiff != 0) {
+            return sizeDiff > 0 ? 1 : -1;
+        }
+
+        String path1 = null;
+        String path2 = null;
+
+        try {
+            path1 = o1.getCanonicalPath();
+            path2 = o2.getCanonicalPath();
+        } catch (Exception e) {
+            System.err.println("ERROR: " + e.getMessage());
+        }
+
+        return path2.compareToIgnoreCase(path1);
     }
 }

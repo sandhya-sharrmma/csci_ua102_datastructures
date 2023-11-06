@@ -1,3 +1,5 @@
+package project4;
+
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
@@ -14,7 +16,11 @@ public class FileOnDisk extends File
     public FileOnDisk(String pathname) throws NullPointerException
     {
         super(pathname);
-        this.pathname = pathname;
+        try {
+            this.pathname = this.getCanonicalPath(); 
+        } catch (Exception e) {
+            System.err.println("ERROR: " + e.getMessage());
+        }
         this.all_files = new ArrayList<File>(); 
         getAllFiles(this); 
         this.totalSize = this.getTotalSize(); 
@@ -48,15 +54,15 @@ public class FileOnDisk extends File
     {
         List<FileOnDisk> largest_files = new ArrayList<>();
 
-        if (this.exists() && this.isFile())
+        if (this.exists() && this.isFile()) //this
             return null; 
         else if (this.exists() && this.isDirectory()){
             for (int i = 0; i < all_files.size(); i++)
                 largest_files.add(new FileOnDisk(all_files.get(i).getAbsolutePath()));
             largest_files.sort(new FileOnDiskComparatorBySize());
+            Collections.reverse(largest_files);
             if (numOfFiles < largest_files.size())
                 largest_files = largest_files.subList(0, numOfFiles);
-            Collections.reverse(largest_files);
         }
         else
             throw new IllegalStateException("Object is neither a file nor a directory.");
@@ -69,13 +75,11 @@ public class FileOnDisk extends File
     {
         String final_output = " "; 
 
-        if (all_files.size() == 0)
-            final_output = "The given file/directory is empty.";
-         
         String size = memoryConverter(); 
+        final_output = size + pathname;
 
-        final_output = size + "     " + pathname;
-        
+        if (all_files.size() == 0) //check this 
+            return  final_output + "\n"  + "The given file/directory is empty.";
         return final_output;
     }
 
@@ -83,13 +87,13 @@ public class FileOnDisk extends File
         String size = " ";
 
         if (totalSize < 1024)
-            size = String.format("%8.2f %s", Double.valueOf(totalSize), "bytes");
+            size = String.format("%8.2f %s  ", Double.valueOf(totalSize), "bytes");
         else if (totalSize >= 1024 && totalSize < 1024*2024)
-            size = String.format("%8.2f %s", Double.valueOf(totalSize/1024.0), "KB");
+            size = String.format("%8.2f %s     ", Double.valueOf(totalSize/1024.0), "KB");
         else if (totalSize >= 1024*2024 && totalSize < 1024*1024*1024)
-            size = String.format("%8.2f %s", Double.valueOf(totalSize/(1024.0*1024)), "MB");
+            size = String.format("%8.2f %s     ", Double.valueOf(totalSize/(1024.0*1024)), "MB");
         else if (totalSize >= 1024*1024*1024)
-            size = String.format("%8.2f %s", Double.valueOf(totalSize/(1024.0*1024*1024)), "GB"); 
+            size = String.format("%8.2f %s     ", Double.valueOf(totalSize/(1024.0*1024*1024)), "GB"); 
 
         return size;
     }

@@ -1,4 +1,4 @@
-// package project4;
+package project4;
 
 import java.io.*;
 import java.util.*;
@@ -66,7 +66,5 @@ public class DiskUsage
 		for (FileOnDisk f : list ) {
 			System.out.println( f );
         }
-		
 	}
-
 }
