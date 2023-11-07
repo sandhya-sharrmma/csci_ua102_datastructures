@@ -1,9 +1,8 @@
-package project4;
+// package project4;
 
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class FileOnDisk extends File
 {
@@ -60,7 +59,6 @@ public class FileOnDisk extends File
             for (int i = 0; i < all_files.size(); i++)
                 largest_files.add(new FileOnDisk(all_files.get(i).getAbsolutePath()));
             largest_files.sort(new FileOnDiskComparatorBySize());
-            Collections.reverse(largest_files);
             if (numOfFiles < largest_files.size())
                 largest_files = largest_files.subList(0, numOfFiles);
         }
