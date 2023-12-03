@@ -11,6 +11,8 @@ import java.util.Iterator;
  *
  * @author Joanna Klukowska
  * @author Sandhya Sharma
+ * 
+ * @version December 3, 2023
  *
  * @param <Word> the type of elements held in this list
  */

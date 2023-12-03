@@ -4,8 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * This is an implementation of a binary search tree to store Word objects. 
+ * It implements Index interface and Iterable interface.   
+ *
+ * @author Sandhya Sharma  
+ * @version December 2, 2023
+ *
+ */
 public class BSTIndex implements Index, Iterable<Word> 
 {
+    //Inner class to represent nodes of this tree 
     private class Node implements Comparable<Node> 
     {
         Word data;
@@ -22,21 +31,33 @@ public class BSTIndex implements Index, Iterable<Word>
             return this.data.compareTo(n.data);
         }
     }
-
+    
+    //private members: a reference to the root node and the size of the tree
     private Node root;
     private int size;
 
+    /**
+     * Constructs a new empty binary search tree.
+     * It sets the root to null and size to 0.
+     */
     public BSTIndex() 
     {
         root = null;
         size = 0;
     }
 
+    /*
+     * Adds an item to the index in sorted order. If the Word object
+     * with the same string already exists, its count is incremented by one. 
+     * 
+     * @param word the word to be added to the index 
+     */
     public void add(String word) 
     {
         if(word == null)
             return;
 
+        // if the tree is empty, create a new node and set it as the root
         if (root == null){
             root = new Node(word);
             size++;
@@ -45,7 +66,8 @@ public class BSTIndex implements Index, Iterable<Word>
 
         Node current = root;
         while (current != null){
-            if (word.compareTo(current.data.getWord()) < 0){ //add in the left subtree
+            // if the word is less than the current node, go to the left subtree
+            if (word.compareTo(current.data.getWord()) < 0){ 
                 if (current.left == null){
                     current.left = new Node(word);
                     size++;
@@ -55,7 +77,8 @@ public class BSTIndex implements Index, Iterable<Word>
                     current = current.left;
                 
             }
-            else if(word.compareTo(current.data.getWord()) > 0){//add in the right subtree
+            // if the word is greater than the current node, go to the right subtree
+            else if(word.compareTo(current.data.getWord()) > 0){
                 if(current.right == null){
                     current.right = new Node(word);
                     size++;
@@ -64,30 +87,48 @@ public class BSTIndex implements Index, Iterable<Word>
                 else 
                     current = current.right;
             }
-            else{ //duplicate
+            // if the word is equal to the current node, increment the count
+            else{ 
                 current.data.incrementCount();
                 return;
             }
         }
     }
-
+    
+    /*
+     * Removes the Word object with the given string from the index. 
+     * If the Word object with the same string does not exist, 
+     * the method does nothing.
+     * 
+     * @param word the word (Word's object's attribute) to be removed from the index
+     */
     public void remove(String word) {
         if(word == null)
             return;
+        //calls to the recursive remove method explained below in detail
         root = remove(root, word);
     }
     
+    /*
+     * Returns the node after modifying the references to the nodes in the tree 
+     * such that the Word object with the @param word is removed from the tree. 
+     * If the Word object with the same string does not exist, 
+     * the method returns the node without any modifications.
+     * 
+     * @param node the root of the tree
+     * @param word the word (Word object's attribute) to be removed from the tree
+     * @return the node of the tree (after the removal)
+     */
     private Node remove(Node node, String word) {
-        if (node == null) {
+        if (node == null)
             return null;
-        }
     
         int cmp = word.compareTo(node.data.getWord());
-        if (cmp < 0) {
+        if (cmp < 0) 
             node.left = remove(node.left, word);
-        } else if (cmp > 0) {
+        else if (cmp > 0)
             node.right = remove(node.right, word);
-        } else {
+        else {
             // case 1: no children
             if (node.left == null && node.right == null) {
                 size--;
@@ -103,7 +144,7 @@ public class BSTIndex implements Index, Iterable<Word>
             }
             // case 3: two children
             else {
-                Node temp = minNode(node.right);
+                Node temp = findSuccessor(node.right);
                 node.data = temp.data;
                 node.right = remove(node.right, temp.data.getWord());
             }
@@ -112,13 +153,26 @@ public class BSTIndex implements Index, Iterable<Word>
         return node;
     }
     
-    private Node minNode(Node node) {
-        while (node.left != null) {
+    /*
+     * Finds the successor of the given node.
+     * 
+     * @param node the node whose successor is to be found
+     * @return the successor of the given node
+     */
+    private Node findSuccessor(Node node) {
+        while (node.left != null)
             node = node.left;
-        }
+        
         return node;
     }
-
+    
+    /*
+     * Returns the count of the Word object associated with the given string, 
+     * or -1 if such a Word object does not exist.
+     * 
+     * @param word the word whose count should be returned
+     * @return the count associated with the word, or -1 if the word does not exist
+     */
     public int get(String word) 
     {
         Node current = root;
@@ -133,11 +187,24 @@ public class BSTIndex implements Index, Iterable<Word>
         return -1;
     }
 
+    /*
+     * Returns the number of unique words stored in the index.
+     * NOTE: this counts each word only once even it the count associated 
+     * with a word is larger than one
+     * @return number of items stored in the index
+     */
+
     public int size()
     {
         return size;
     }
 
+    /*
+     * Returns a string representation of this tree in the following format:
+     * [count word, count word, ...] 
+     * 
+     * @return a string representation of this tree
+     */
     @Override
     public String toString()
     {
@@ -147,10 +214,10 @@ public class BSTIndex implements Index, Iterable<Word>
             return "[]";
 
         Iterator<Word> it = this.iterator();
-        while(it.hasNext()){
+        while(it.hasNext())
             to_return = to_return + it.next().toString() + ", ";
-        }
 
+        //remove the last comma and space in the string
         if (to_return.toString().endsWith(", "))
             to_return = to_return.substring(0, to_return.length() - 2);
         
@@ -159,6 +226,21 @@ public class BSTIndex implements Index, Iterable<Word>
         return to_return.toString();
     }
 
+    /*
+     * An equals method to compare this tree with a SortedLinkedList implementation 
+     * for the same input data. 
+     * Two data structures are equal if they contain the same number of elements and each 
+     * element is equal to the corresponding element in the other data structure.
+     * Here, the two data structures being compared for equality is this tree and the
+     * SortedLinkedList implementation. 
+     * 
+     * Given that two data structures are being compared, it uses the iterator implemented 
+     * for each data structure to traverse through each data structure and compare the
+     * elements at each position. 
+     * 
+     * @param o the object to compare with this tree
+     * @return true if the specified object is equal to this tree, false otherwise
+     */
     @Override
     public boolean equals(Object o)
     {
@@ -183,19 +265,37 @@ public class BSTIndex implements Index, Iterable<Word>
         return true;
     }
 
-    //ITERATORS
-   /* A basic forward iterator for this list. */
-    private class TreeIterator implements Iterator<Word> {
+    /*
+     * An iterator class implemented to traverse through the tree in inorder traversal.
+     * It uses an ArrayList to store the elements in the tree in inorder traversal, 
+     * meaning, the elements in this BST is traversed in order and each Word object is added
+     * to the ArrayList when an iterator is instantiated. 
+     * 
+     * The iterator has three methods: hasNext(), next(), and remove().
+     */
+    private class TreeIterator implements Iterator<Word> 
+    {
+        //private members: an ArrayList to store the elements in the tree in inorder traversal
+        //and two variables to keep track of the current index and the last returned index
         private ArrayList<Word> arrayList;
         private int currentIndex;
         private int lastReturnedIndex;
 
+        /*
+         * Constructs a new iterator for this tree. 
+         */
         public TreeIterator(){
             arrayList = new ArrayList<>();
             currentIndex = 0;
             inorderTraversal(root);
         }
 
+        /*
+         * Traverses through the tree in inorder traversal and adds each Word object to the 
+         * ArrayList. 
+         * 
+         * @param node the node to start the traversal from (begins with the root)
+         */
         private void inorderTraversal(Node node){
             if (node != null){
                 inorderTraversal(node.left);
@@ -204,11 +304,23 @@ public class BSTIndex implements Index, Iterable<Word>
             }
         }
 
+        /*
+         * Returns true if the iteration has more elements.
+         */
         @Override
         public boolean hasNext(){
             return currentIndex < arrayList.size();
         }
-
+        
+        /*
+         * Returns the next element in the iteration and advances the iterator
+         * in the arraylist. 
+         * The variable lastReturnedIndex is used to keep track of the last returned 
+         * element in the iteration to be used in the remove() method.
+         * 
+         * @throws NoSuchElementException if the iteration has no more elements 
+         * @return the next element in the iteration
+         */
         @Override
         public Word next(){
             if (!hasNext()) {
@@ -219,9 +331,20 @@ public class BSTIndex implements Index, Iterable<Word>
             return arrayList.get(lastReturnedIndex);
         }
 
+        /*
+         * Removes from the underlying collection the last element returned by this iterator.
+         * This method can be called only once per call to next(). 
+         * 
+         * It uses the lastReturnedIndex variable to remove the element from the ArrayList.
+         * It also removes the Word object from the tree using the remove() method implemented 
+         * above.
+         * 
+         * @throws IllegalStateException if the next method has not yet been called meaning the 
+         * iterator is at the beginning of the list. 
+         */
         public void remove(){
             if(lastReturnedIndex == -1)
-                throw new IllegalStateException("Iterator at the beginning of the list – cannot remove.");
+                throw new IllegalStateException("Iterator at the beginning of the list");
             
             Word word_to_remove = arrayList.get(lastReturnedIndex);
             arrayList.remove(lastReturnedIndex);
@@ -233,10 +356,13 @@ public class BSTIndex implements Index, Iterable<Word>
         }
     }
 
+    /*
+     * Returns an iterator over the elements in the tree.
+     * 
+     * @return an iterator over the elements in the tree
+     */
     @Override
     public Iterator<Word> iterator() {
         return new TreeIterator();
     }
 }
-
-
