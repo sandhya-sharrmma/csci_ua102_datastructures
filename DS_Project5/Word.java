@@ -5,7 +5,7 @@ package project5;
  * It implements Comparable interface to compare two Word objects lexicographically.
  *
  * @author Sandhya Sharma
- * @version December 2, 2023s
+ * @version December 3, 2023
  *
  */
 public class Word implements Comparable<Word>
@@ -17,9 +17,13 @@ public class Word implements Comparable<Word>
     /**
      * Constructs a new Word object with the given word and sets initial count as 1.
      * @param word the word to be stored
+     * @throws NullPointerException if the word is null or empty 
      */
-    public Word(String word)
+    public Word(String word) throws NullPointerException 
     {
+        if(word == null || word.trim().isEmpty())
+            throw new NullPointerException("Word cannot be null or empty.");
+        
         this.word = word;
         this.count = 1;
     }

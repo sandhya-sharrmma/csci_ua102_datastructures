@@ -66,15 +66,18 @@ public class SortedLinkedList implements Index, Iterable<Word>
 
      /**
      * Adds the specified element to the list in ascending order.
+     * If the element is already present in the list, its count is incremented by 1.
      *
      * @param element the element to add
-     * @return true if the element was added successfully, false otherwise (or if the element is null)
+     * @throws IllegalArgumentException if the element is null
      */
     public void add(String element)
     {
         if(element == null)
-            return;  
+            throw new IllegalArgumentException("Element cannot be null.");  
         
+        element = element.toLowerCase().trim();
+
         Node newNode = new Node(new Word(element));
 
         if(size == 0){
@@ -97,7 +100,7 @@ public class SortedLinkedList implements Index, Iterable<Word>
                     head = newNode;
                     newNode.prev = null; 
                 }
-                else {
+                else{
                     newNode.next = current;
                     newNode.prev = current.prev;
                     current.prev.next = newNode;
@@ -118,23 +121,19 @@ public class SortedLinkedList implements Index, Iterable<Word>
     }
 
     /**
-     * Returns the element at the specified index in the list.
+     * Returns the count of the specified word in this list 
+     * or -1 if this list does not contain the word.
      *
-     * @param index the index of the element to return
-     * @return the element at the specified index
-     * @throw IndexOutOfBoundsException  if the index is out of
-     * range (index < 0 || index >= size())
+     * @param word the word whose count is to be returned
+     * @return the count of the specified word in this list, 
+     * or -1 if this list does not contain the word
      */
     public int get(String word)
     {
-        if(word == null)
+        if(word == null || this.size() == 0 || word.trim().isEmpty())
             return -1;
-        
-        if(this.size() == 0)
-            return -1;
-        
-        if(!word.getClass().equals(head.data.getClass()))
-            return -1;
+
+        word = word.toLowerCase().trim();
 
         Node current = head; 
 
@@ -148,11 +147,11 @@ public class SortedLinkedList implements Index, Iterable<Word>
     }
 
      /**
-     * Removes the first occurence of the specified element from the list.
-     *
-     * @param o the element to remove
-     * @return true if the element was removed successfully,
-     * false otherwise
+     * Removes an item from the list if it exists, otherwise the list remains
+     * unchanged. This operation removes the Word object matching the
+     * word regardless of what the count is.
+     * 
+     * @param word the word to remove, if present
      */
 
     public void remove(String word) 
@@ -223,7 +222,7 @@ public class SortedLinkedList implements Index, Iterable<Word>
      * @return true if the specified object is equal to this list,
      * false otherwise
      */
-    @SuppressWarnings("unchecked")
+    @Override
     public boolean equals(Object o)
     {
         if (o == null)
@@ -248,30 +247,53 @@ public class SortedLinkedList implements Index, Iterable<Word>
     }
 
     //ITERATORS
-   /* A basic forward iterator for this list. */
+   /**
+    * A class for forward iterator for this list. 
+    * 
+    * The class has three methods: hasNext(), next(), and remove().
+    */
     private class ListIterator implements Iterator<Word> 
     {
         Node nextToReturn = head;
         Node lastReturned = null;
 
+        /**
+         * Returns true if the iteration has more elements, false otherwise.
+         */
         @Override
-        public boolean hasNext() {
+        public boolean hasNext() 
+        {
             return nextToReturn != null;
         }
 
+        /**
+         * Returns the next element in the iteration.
+         * It also keeps track of the last returned element for the remove() method.
+         * 
+         * @return the next element in the iteration
+         * @throws NoSuchElementException if the iteration has no more elements
+         */
         @Override
-        public Word next() throws NoSuchElementException {
+        public Word next() throws NoSuchElementException 
+        {
             if (nextToReturn == null)
                 throw new NoSuchElementException("End of the list reached.");
             lastReturned = nextToReturn;
             Word tmp = lastReturned.data;
-            nextToReturn = nextToReturn.next; 
+            nextToReturn = nextToReturn.next;
             return tmp;
         }
 
-        public void remove() {
+        /**
+         * Removes from the underlying collection the last element returned by this iterator.
+         * This method can be called only once per call to next().
+         * 
+         * @throws IllegalStateException if the next method has not yet been called. 
+         */
+        public void remove() throws IllegalStateException
+        {
             if (lastReturned == null)
-                throw new NullPointerException("next() has not been called yet.");
+                throw new IllegalStateException("next() has not been called yet.");
             
             String word_to_remove = lastReturned.data.getWord();
 
