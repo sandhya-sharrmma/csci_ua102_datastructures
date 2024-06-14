@@ -1,1 +1,1 @@
-Repository for Data Structures Course. 
+Repository for Data Structures course assignments in Java. 
